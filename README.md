@@ -1,8 +1,20 @@
-# This script allows you to get a list of repositories related to a certain language and given search query.
+# pyRepoFinder 1.0
 
-##pyGithubFinder 1.0
+## This script allows you to filter Github repositories based on :-
 
-# input (command line args):
+- Star-count.
+  
+- Followers-count.
+
+- Main-language.
+  
+- Last-commit by Date Range.
+  
+- Search parameter (Optional).
+
+### Which You can output in a `.txt` file
+
+## input (command line args)
 
     - stars (greater than 100)
     - watches ( greater than 20)
@@ -12,7 +24,7 @@
     - latest commit (can be set by user)
             commit "https://api.github.com/repos/TheAlgorithms/Java/commits"
 
-# output (.txt file):
+### output (`.txt` file)
 
     - repo name
     - repo URl
