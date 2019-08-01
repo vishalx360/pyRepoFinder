@@ -4,7 +4,7 @@
 
 
 import requests
-
+import dateutil.parser
 
 baseUrl = "https://api.github.com/"
 
@@ -55,13 +55,20 @@ counter = 1
 # main loop
 for item in repoList['items']:
     if (item['stargazers_count'] > 100) & (item["watchers_count"] > 20):
+        # using context-manager to open file.
         with open((outputFile + '.txt'), 'a+') as opened_file:
+            # writing repo name.
             opened_file.write("%d. Repo Name: %s\n" %
                               (counter, item['name']))
+            # writing repo url.
             opened_file.write("Repo URL: %s\n" % item['html_url'])
-            opened_file.write("Updated At: %s" % item['updated_at'])
-            opened_file.write("\n")
-            opened_file.write("\n")
+            # parsing ISO-8601 date.
+            newDate = dateutil.parser.parse(item['updated_at']).date()
+            opened_file.write("Last Event At: %s" % newDate)
+
+            # adding spaces.
+            opened_file.write("\n \n")
+            # incrimenting counter.
             counter += 1
 
 
