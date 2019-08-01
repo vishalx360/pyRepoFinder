@@ -2,15 +2,15 @@
 
 ## This script allows you to filter Github repositories based on :-
 
-- Star-count.
-  
-- Followers-count.
+* Star-count.
 
-- Main-language.
-  
-- Last-commit by Date Range.
-  
-- Search parameter (Optional).
+* Followers-count.
+
+* Main-language.
+
+* Last-commit by Date Range.
+
+* Search parameter (Optional).
 
 ### Which You can output in a `.txt` file
 
@@ -31,3 +31,11 @@
     - repo Total number of commits
     - last commit date
     - last commit URL
+
+TODO
+
+* config for adding API token
+* repo Total number of commits
+* last commit
+* last commit date
+* last commit URL
