@@ -1,4 +1,5 @@
 # importing
+import sys
 import requests
 from bs4 import BeautifulSoup
 
@@ -25,7 +26,11 @@ def getCommitDetails(url):
     CommitContainer = soup.find_all('td', {'class': 'message'})[0].find('a')
 
     # * last commit text
-    lastCommit = CommitContainer.text.strip()
+    try:
+        lastCommit = CommitContainer.text.strip()
+    except AttributeError:
+        print("API Error, try after some time")
+        sys.exit(0)
     # * last commit URL
     lastCommitURl = (CommitContainer['href'])
 

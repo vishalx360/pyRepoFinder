@@ -1,6 +1,7 @@
 # pyRepoFinder 1.0;
 # This script allows you to get a list of repositories related to a certain language and given search query.;
 # Author : @vishalx360;
+import sys
 import random
 import dateutil.parser
 import requests
@@ -75,9 +76,12 @@ print("\n")
 # log
 
 # getting input for language
+
 inputLanguage = str(
     input(">>> Which Language do you want to filter by ? : ") or "Java")
 query_language = inputLanguage
+
+
 # END: language input section
 
 # START: Search keyword section
@@ -118,8 +122,11 @@ print("""
 newDate = str(input(">>> Last Updated ? : ")
               or defaultDate)
 
-inputDate = dateutil.parser.parse(newDate).date()
-
+try:
+    inputDate = dateutil.parser.parse(newDate).date()
+except ValueError:
+    print("Input must be in Date Format, for Example 2019-01-01")
+    sys.exit(0)
 print("\n")
 
 # END: last Date input section
@@ -157,8 +164,19 @@ print("Requesting Github API with provided parameters..... ")
 print("\n")
 
 # requesting
-searchRepo = requests.get(
-    (base_API_Url + "search/repositories?per_page=50&q=" + queryString), timeout=10)
+
+try:
+    searchRepo = requests.get(
+        (base_API_Url + "search/repositories?per_page=50&q=" + queryString), timeout=10)
+
+except KeyboardInterrupt:
+    print("\nQuitting ...\n")
+    sys.exit(0)
+except:
+    print("""
+    ERROR: No Internet Connection Found.
+    """)
+    exit()
 
 # converting to JSON
 repoList = searchRepo.json()
@@ -191,41 +209,44 @@ counter = 1
 # main loop
 print("Writing to " + (outputFile + '.txt ... ... ...\n'))
 
-for item in repoList['items']:
+try:
+    for item in repoList['items']:
 
-    # COMMIT details
-    newCommitObject = getCommitDetails(item['html_url'])
-    # check for date.
-    commitDATE = dateutil.parser.parse(
-        newCommitObject.lastCommitISODate).date()
+        # COMMIT details
+        newCommitObject = getCommitDetails(item['html_url'])
+        # check for date.
+        commitDATE = dateutil.parser.parse(
+            newCommitObject.lastCommitISODate).date()
 
-    # debug print('comparing ', commitDATE, 'with', newDate)
-    if(commitDATE > inputDate):
-        if (item['stargazers_count'] > 100) & (item["watchers_count"] > 20):
-            # using context-manager to open file.
-            with open((outputFile + '.txt'), 'a+') as opened_file:
-                # writing repo name.
-                opened_file.write("%d. Repo Name: %s\n" %
-                                  (counter, item['name']))
-                # writing repo url.
-                opened_file.write("Repo URL: %s\n" % item['html_url'])
+        # debug print('comparing ', commitDATE, 'with', newDate)
+        if(commitDATE > inputDate):
+            if (item['stargazers_count'] > 100) & (item["watchers_count"] > 20):
+                # using context-manager to open file.
+                with open((outputFile + '.txt'), 'a+') as opened_file:
+                    # writing repo name.
+                    opened_file.write("%d. Repo Name: %s\n" %
+                                      (counter, item['name']))
+                    # writing repo url.
+                    opened_file.write("Repo URL: %s\n" % item['html_url'])
 
-                opened_file.write("Total Commits: %s\n" %
-                                  newCommitObject.totalCommits)
-                opened_file.write("Last Commit: %s\n" %
-                                  newCommitObject.lastCommit)
-                opened_file.write("Last Commit Date: %s\n" %
-                                  newCommitObject.lastCommitDate)
-                opened_file.write("Last Commit URL: %s%s\n" %
-                                  (baseURL, (newCommitObject.lastCommitURL[0])))
-                # adding spaces.
-                opened_file.write("\n \n")
-                # incrimenting counter.
-                counter += 1
-    else:
-        pass
+                    opened_file.write("Total Commits: %s\n" %
+                                      newCommitObject.totalCommits)
+                    opened_file.write("Last Commit: %s\n" %
+                                      newCommitObject.lastCommit)
+                    opened_file.write("Last Commit Date: %s\n" %
+                                      newCommitObject.lastCommitDate)
+                    opened_file.write("Last Commit URL: %s%s\n" %
+                                      (baseURL, (newCommitObject.lastCommitURL[0])))
+                    # adding spaces.
+                    opened_file.write("\n \n")
+                    # incrimenting counter.
+                    counter += 1
+        else:
+            pass
 
-
+except KeyboardInterrupt:
+    print("\nQuitting ...\n")
+    sys.exit(0)
 # logging details of request
 print("Found %d Repositories  and saved in %s" %
       ((counter - 1), (outputFile + '.txt\n')))
