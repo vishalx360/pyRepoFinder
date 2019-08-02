@@ -4,9 +4,12 @@
 import random
 import dateutil.parser
 import requests
+import datetime
+from scraper import getCommitDetails
 
-baseUrl = "https://api.github.com/"
 
+base_API_Url = "https://api.github.com/"
+baseURL = "https://www.github.com"
 # actual search web-api
 # https://api.github.com/search/repositories?q=stars:>100+pushed:>2019-01-01+followers:>10+language:java
 
@@ -24,7 +27,7 @@ query_stars = '>100'
 query_lastUpdated = '>2019-01-01'
 query_followers = '>10'
 query_language = 'java'
-query_search_keyword = 'web'
+query_search_keyword = 'android'
 
 
 # START: language input section
@@ -84,7 +87,7 @@ print("----~ Search-keywords ~-----")
 print("""
  ! Search-keywords helps to filter repositories
    that contains given keyword in their name.
-   for example :- Crypto
+   for example :- Crypto, Android, Linux etc
 
  ! Default : \"web\" 
     """)
@@ -95,6 +98,31 @@ inputKeyword = str(input(">>> Repo-Name must contain ? : ")
 query_search_keyword = inputKeyword
 print("\n")
 # END: Search keyword section
+
+
+# START: last Date input section
+defaultDate = (datetime.date.today() -
+               datetime.timedelta(6*365/12)).isoformat()
+# log
+print("\n")
+print("----~ Last Commit Date filter ~-----")
+print("""
+ ! Filter repositories by last commit.
+ ! format :  YYYY-MM-DD
+ ! example : 2019-01-01
+
+ ! Default : "%s (6 months ago from today)" 
+    """ % str(defaultDate))
+# log
+
+newDate = str(input(">>> Last Updated ? : ")
+              or defaultDate)
+
+inputDate = dateutil.parser.parse(newDate).date()
+
+print("\n")
+
+# END: last Date input section
 
 
 # outputFileName input section
@@ -130,7 +158,7 @@ print("\n")
 
 # requesting
 searchRepo = requests.get(
-    (baseUrl + "search/repositories?per_page=100&q=" + queryString), timeout=10)
+    (base_API_Url + "search/repositories?per_page=50&q=" + queryString), timeout=10)
 
 # converting to JSON
 repoList = searchRepo.json()
@@ -161,24 +189,41 @@ headerText.close()
 # counter
 counter = 1
 # main loop
-print("Writing to " + (outputFile + '.txt'))
-for item in repoList['items']:
-    if (item['stargazers_count'] > 100) & (item["watchers_count"] > 20):
-        # using context-manager to open file.
-        with open((outputFile + '.txt'), 'a+') as opened_file:
-            # writing repo name.
-            opened_file.write("%d. Repo Name: %s\n" %
-                              (counter, item['name']))
-            # writing repo url.
-            opened_file.write("Repo URL: %s\n" % item['html_url'])
-            # parsing ISO-8601 date.
-            newDate = dateutil.parser.parse(item['updated_at']).date()
-            opened_file.write("Last Event At: %s" % newDate)
+print("Writing to " + (outputFile + '.txt ... ... ...\n'))
 
-            # adding spaces.
-            opened_file.write("\n \n")
-            # incrimenting counter.
-            counter += 1
+for item in repoList['items']:
+
+    # COMMIT details
+    newCommitObject = getCommitDetails(item['html_url'])
+    # check for date.
+    commitDATE = dateutil.parser.parse(
+        newCommitObject.lastCommitISODate).date()
+
+    # debug print('comparing ', commitDATE, 'with', newDate)
+    if(commitDATE > inputDate):
+        if (item['stargazers_count'] > 100) & (item["watchers_count"] > 20):
+            # using context-manager to open file.
+            with open((outputFile + '.txt'), 'a+') as opened_file:
+                # writing repo name.
+                opened_file.write("%d. Repo Name: %s\n" %
+                                  (counter, item['name']))
+                # writing repo url.
+                opened_file.write("Repo URL: %s\n" % item['html_url'])
+
+                opened_file.write("Total Commits: %s\n" %
+                                  newCommitObject.totalCommits)
+                opened_file.write("Last Commit: %s\n" %
+                                  newCommitObject.lastCommit)
+                opened_file.write("Last Commit Date: %s\n" %
+                                  newCommitObject.lastCommitDate)
+                opened_file.write("Last Commit URL: %s%s\n" %
+                                  (baseURL, (newCommitObject.lastCommitURL[0])))
+                # adding spaces.
+                opened_file.write("\n \n")
+                # incrimenting counter.
+                counter += 1
+    else:
+        pass
 
 
 # logging details of request
