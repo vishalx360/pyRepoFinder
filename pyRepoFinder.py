@@ -10,7 +10,24 @@ baseUrl = "https://api.github.com/"
 # actual search web-api
 # https://api.github.com/search/repositories?q=stars:>100+pushed:>2019-01-01+followers:>10+language:java
 
+hashSeperator = "#############################"
+# intro section
+print("\n")
+print(hashSeperator)
+print("----# pyRepoFinder 1.0 #----- ")
+print(hashSeperator)
 
+
+# q=stars:>100+pushed:>2019-01-01+followers:>10+language:java
+# defaults
+query_stars = '>100'
+query_lastUpdated = '>2019-01-01'
+query_followers = '>10'
+query_language = 'java'
+query_search_keyword = 'web'
+
+
+# START: language input section
 language_list = [
     "ActionScript",
     "C",
@@ -38,25 +55,6 @@ language_list = [
     "TeX",
     "Vim script"
 ]
-hashSeperator = "#############################"
-# intro section
-print("\n")
-print(hashSeperator)
-print("----# pyRepoFinder 1.0 #----- ")
-print(hashSeperator)
-
-
-# q=stars:>100+pushed:>2019-01-01+followers:>10+language:java
-# defaults
-query_stars = '>100'
-query_lastUpdated = '>2019-01-01'
-query_followers = '>10'
-query_language = 'java'
-query_search_keyword = 'web'
-
-
-# START: language input section
-
 # log
 random_languages = ""
 # logging random language

@@ -39,3 +39,4 @@ TODO
 * last commit
 * last commit date
 * last commit URL
+* check for internet error handler
