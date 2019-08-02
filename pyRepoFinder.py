@@ -198,7 +198,7 @@ Output for folowing parameters:-
                      query_language,
                      query_stars,
                      query_followers,
-                     query_lastUpdated,
+                     str(inputDate),
                      query_search_keyword)
                  )
 headerText.close()
